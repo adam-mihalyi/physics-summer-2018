@@ -164,24 +164,37 @@ int TMVAClassification( TString myMethodList = "" )
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *input(0);
-   TString fname = "./tmva_class_example.root";
+   TString fname = "/scratch/dglazier/rho10_tm1_sm1_stat/Signal.root";
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    }
-   else {
-      TFile::SetCacheFileDir(".");
-      input = TFile::Open("http://root.cern.ch/files/tmva_class_example.root", "CACHEREAD");
-   }
+//   else {
+//      TFile::SetCacheFileDir(".");
+//      input = TFile::Open("http://root.cern.ch/files/tmva_class_example.root", "CACHEREAD");
+//   }
    if (!input) {
       std::cout << "ERROR: could not open data file" << std::endl;
       exit(1);
    }
    std::cout << "--- TMVAClassification       : Using input file: " << input->GetName() << std::endl;
 
+
+   TFile *input2(0);
+   TString fname2 = "/scratch/dglazier/rho10_tm1_sm1_stat/Background.root";
+   if (!gSystem->AccessPathName( fname2 )) {
+      input2 = TFile::Open( fname2 ); // check if file in local directory exists
+   }
+   if (!input2) {
+      std::cout << "ERROR: could not open data file" << std::endl;
+      exit(1);
+   }
+   std::cout << "--- TMVAClassification       : Using input2 file: " << input2->GetName() << std::endl;
+
+
    // Register the training and test trees
 
-   TTree *signalTree     = (TTree*)input->Get("TreeS");
-   TTree *background     = (TTree*)input->Get("TreeB");
+   TTree *signalTree     = (TTree*)input->Get("HSParticles");
+   TTree *background     = (TTree*)input2->Get("HSParticles");
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
    TString outfileName( "TMVA.root" );
@@ -210,17 +223,19 @@ int TMVAClassification( TString myMethodList = "" )
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
-   dataloader->AddVariable( "myvar1 := var1+var2", 'F' );
-   dataloader->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
-   dataloader->AddVariable( "var3",                "Variable 3", "units", 'F' );
-   dataloader->AddVariable( "var4",                "Variable 4", "units", 'F' );
+//   dataloader->AddVariable( "myvar1 := var1+var2", 'F' );
+//   dataloader->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
+   dataloader->AddVariable( "ElTime",                "Variable 1", "units", 'F' );
+   dataloader->AddVariable( "PTime",                "Variable 2", "units", 'F' );
+   dataloader->AddVariable( "PipTime",                "Variable 3", "units", 'F' );
+   dataloader->AddVariable( "PimTime",                "Variable 4", "units", 'F' );
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
    // input variables, the response values of all trained MVAs, and the spectator variables
 
-   dataloader->AddSpectator( "spec1 := var1*2",  "Spectator 1", "units", 'F' );
-   dataloader->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
+//   dataloader->AddSpectator( "spec1 := var1*2",  "Spectator 1", "units", 'F' );
+//   dataloader->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
 
 
    // global event weights per tree (see below for setting event-wise weights)
@@ -274,7 +289,7 @@ int TMVAClassification( TString myMethodList = "" )
    // Set individual event weights (the variables must exist in the original TTree)
    // -  for signal    : `dataloader->SetSignalWeightExpression    ("weight1*weight2");`
    // -  for background: `dataloader->SetBackgroundWeightExpression("weight1*weight2");`
-   dataloader->SetBackgroundWeightExpression( "weight" );
+//   dataloader->SetBackgroundWeightExpression( "weight" );
 
    // Apply additional cuts on the signal and background samples (can be different)
    TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
