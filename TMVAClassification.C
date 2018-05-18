@@ -225,11 +225,20 @@ int TMVAClassification( TString myMethodList = "" )
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 //   dataloader->AddVariable( "myvar1 := var1+var2", 'F' );
 //   dataloader->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
-   dataloader->AddVariable( "ElTime",                "Variable 1", "units", 'F' );
-   dataloader->AddVariable( "PTime",                "Variable 2", "units", 'F' );
-   dataloader->AddVariable( "PipTime",                "Variable 3", "units", 'F' );
-   dataloader->AddVariable( "PimTime",                "Variable 4", "units", 'F' );
+   dataloader->AddVariable( "ElTime",  "ElTime",  "units", 'F' );
+   dataloader->AddVariable( "PTime",   "PTime",   "units", 'F' );
+   dataloader->AddVariable( "PipTime", "PipTime", "units", 'F' );
+   dataloader->AddVariable( "PimTime", "PimTime", "units", 'F' );
 
+   dataloader->AddVariable( "ElP",  "ElP",  "units", 'F' );
+   dataloader->AddVariable( "PP",   "PP",   "units", 'F' );
+   dataloader->AddVariable( "PipP", "PipP", "units", 'F' );
+   dataloader->AddVariable( "PimP", "PimP", "units", 'F' );
+
+   dataloader->AddVariable( "ElTh",  "ElTh",  "units", 'F' );
+   dataloader->AddVariable( "PTh",   "PTh",   "units", 'F' );
+   dataloader->AddVariable( "PipTh", "PipTh", "units", 'F' );
+   dataloader->AddVariable( "PimTh", "PimTh", "units", 'F' );
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
    // input variables, the response values of all trained MVAs, and the spectator variables
