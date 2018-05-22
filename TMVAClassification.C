@@ -168,10 +168,6 @@ int TMVAClassification( TString myMethodList = "" )
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    }
-//   else {
-//      TFile::SetCacheFileDir(".");
-//      input = TFile::Open("http://root.cern.ch/files/tmva_class_example.root", "CACHEREAD");
-//   }
    if (!input) {
       std::cout << "ERROR: could not open data file" << std::endl;
       exit(1);
@@ -223,8 +219,6 @@ int TMVAClassification( TString myMethodList = "" )
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
-//   dataloader->AddVariable( "myvar1 := var1+var2", 'F' );
-//   dataloader->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
    dataloader->AddVariable( "ElTime",  "ElTime",  "units", 'F' );
    dataloader->AddVariable( "PTime",   "PTime",   "units", 'F' );
    dataloader->AddVariable( "PipTime", "PipTime", "units", 'F' );
