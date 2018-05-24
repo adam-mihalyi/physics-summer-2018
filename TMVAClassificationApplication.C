@@ -147,9 +147,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
 
    // Spectator variables declared in the training have to be added to the reader, too
-//   Float_t spec1,spec2;
-//   reader->AddSpectator( "spec1 := var1*2",   &spec1 );
-//   reader->AddSpectator( "spec2 := var1*3",   &spec2 );
+   Float_t spec1;
+   reader->AddSpectator( "MissMass2",   &spec1 );
 //
 //   Float_t Category_cat1, Category_cat2, Category_cat3;
 //   if (Use["Category"]){
@@ -213,6 +212,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    TH1F *histDnnGpu(0);
    TH1F *histDnnCpu(0);
 
+   TH2F *histMass(0);
+
    if (Use["Likelihood"])    histLk      = new TH1F( "MVA_Likelihood",    "MVA_Likelihood",    nbin, -1, 1 );
    if (Use["LikelihoodD"])   histLkD     = new TH1F( "MVA_LikelihoodD",   "MVA_LikelihoodD",   nbin, -1, 0.9999 );
    if (Use["LikelihoodPCA"]) histLkPCA   = new TH1F( "MVA_LikelihoodPCA", "MVA_LikelihoodPCA", nbin, -1, 1 );
@@ -234,7 +235,13 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    if (Use["TMlpANN"])       histNnT     = new TH1F( "MVA_TMlpANN",       "MVA_TMlpANN",       nbin, -1.3, 1.3 );
    if (Use["DNN_GPU"]) histDnnGpu = new TH1F("MVA_DNN_GPU", "MVA_DNN_GPU", nbin, -0.1, 1.1);
    if (Use["DNN_CPU"]) histDnnCpu = new TH1F("MVA_DNN_CPU", "MVA_DNN_CPU", nbin, -0.1, 1.1);
-   if (Use["BDT"])           histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+
+   if (Use["BDT"])           {
+      histBdt  = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+      histMass = new TH2F( "MVA_BDT_MissMass2", "MVA_BDT_MissMass2", nbin, -0.8, 0.8 ,nbin, -400, 400 );
+   }
+
+
    if (Use["BDTG"])          histBdtG    = new TH1F( "MVA_BDTG",          "MVA_BDTG",          nbin, -1.0, 1.0 );
    if (Use["BDTB"])          histBdtB    = new TH1F( "MVA_BDTB",          "MVA_BDTB",          nbin, -1.0, 1.0 );
    if (Use["BDTD"])          histBdtD    = new TH1F( "MVA_BDTD",          "MVA_BDTD",          nbin, -0.8, 0.8 );
@@ -292,7 +299,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    theTree->SetBranchAddress( "PipTime", &var3);
    theTree->SetBranchAddress( "PimTime", &var4);
 
+   theTree->SetBranchAddress( "MissMass2", &spec1);
 
+
+   double evalBDT = 0;
    // Efficiency calculator for cut method
    Int_t    nSelCutsGA = 0;
    Double_t effS       = 0.7;
@@ -343,7 +353,11 @@ void TMVAClassificationApplication( TString myMethodList = "" )
       if (Use["TMlpANN"      ])   histNnT    ->Fill( reader->EvaluateMVA( "TMlpANN method"       ) );
       if (Use["DNN_GPU"]) histDnnGpu->Fill(reader->EvaluateMVA("DNN_GPU method"));
       if (Use["DNN_CPU"]) histDnnCpu->Fill(reader->EvaluateMVA("DNN_CPU method"));
-      if (Use["BDT"          ])   histBdt    ->Fill( reader->EvaluateMVA( "BDT method"           ) );
+      if (Use["BDT"          ]) {
+         evalBDT=reader->EvaluateMVA("BDT method");
+         histBdt    ->Fill( evalBDT );
+         histMass   ->Fill( evalBDT, spec1 );
+      }
       if (Use["BDTG"         ])   histBdtG   ->Fill( reader->EvaluateMVA( "BDTG method"          ) );
       if (Use["BDTB"         ])   histBdtB   ->Fill( reader->EvaluateMVA( "BDTB method"          ) );
       if (Use["BDTD"         ])   histBdtD   ->Fill( reader->EvaluateMVA( "BDTD method"          ) );
@@ -429,7 +443,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    if (Use["TMlpANN"      ])   histNnT    ->Write();
    if (Use["DNN_GPU"]) histDnnGpu->Write();
    if (Use["DNN_CPU"]) histDnnCpu->Write();
-   if (Use["BDT"          ])   histBdt    ->Write();
+   if (Use["BDT"          ])   {
+      histBdt    ->Write();
+      histMass   ->Write();
+   }
    if (Use["BDTG"         ])   histBdtG   ->Write();
    if (Use["BDTB"         ])   histBdtB   ->Write();
    if (Use["BDTD"         ])   histBdtD   ->Write();
