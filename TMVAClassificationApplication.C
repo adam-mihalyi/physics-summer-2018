@@ -304,7 +304,12 @@ void TMVAClassificationApplication( TString myMethodList = "" )
    sw.Start();
    for (Long64_t ievt=0; ievt<theTree->GetEntries();ievt++) {
 
-      if (ievt%1000 == 0) std::cout << "--- ... Processing event: " << ievt << std::endl;
+      if (ievt%10000 == 0) {
+         std::cout << "--- ... Processing event: " << ievt << std::endl;
+         sw.Stop();
+         sw.Print();
+         sw.Continue();
+      }
 
       theTree->GetEntry(ievt);
 
