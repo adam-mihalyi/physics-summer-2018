@@ -233,12 +233,6 @@ int TMVAClassification( TString myMethodList = "" )
    dataloader->AddVariable( "PTh",   "PTh",   "units", 'F' );
    dataloader->AddVariable( "PipTh", "PipTh", "units", 'F' );
    dataloader->AddVariable( "PimTh", "PimTh", "units", 'F' );
-   // You can add so-called "Spectator variables", which are not used in the MVA training,
-   // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
-   // input variables, the response values of all trained MVAs, and the spectator variables
-
-//   dataloader->AddSpectator( "spec1 := var1*2",  "Spectator 1", "units", 'F' );
-//   dataloader->AddSpectator( "spec2 := var1*3",  "Spectator 2", "units", 'F' );
 
 
    // global event weights per tree (see below for setting event-wise weights)
