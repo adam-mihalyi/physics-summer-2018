@@ -164,7 +164,7 @@ int TMVAClassification( TString myMethodList = "" )
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *input(0);
-   TString fname = "/scratch/dglazier/rho10_tm1_sm1_stat/Signal.root";
+   TString fname = "/scratch/dglazier/tmva3/Signal2Pi.root";
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    }
@@ -176,7 +176,7 @@ int TMVAClassification( TString myMethodList = "" )
 
 
    TFile *input2(0);
-   TString fname2 = "/scratch/dglazier/rho10_tm1_sm1_stat/Background.root";
+   TString fname2 = "/scratch/dglazier/tmva3/BG2Pi.root";
    if (!gSystem->AccessPathName( fname2 )) {
       input2 = TFile::Open( fname2 ); // check if file in local directory exists
    }
@@ -189,8 +189,12 @@ int TMVAClassification( TString myMethodList = "" )
 
    // Register the training and test trees
 
-   TTree *signalTree     = (TTree*)input->Get("HSParticles");
-   TTree *background     = (TTree*)input2->Get("HSParticles");
+   TTree *signalTree0     = (TTree*)input->Get("HSParticles");
+   TTree *background0     = (TTree*)input2->Get("HSParticles");
+   gROOT->cd();
+   TTree *signalTree    =signalTree0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
+   gROOT->cd();
+   TTree *background     = background0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
    TString outfileName( "TMVA.root" );
@@ -233,6 +237,29 @@ int TMVAClassification( TString myMethodList = "" )
    dataloader->AddVariable( "PTh",   "PTh",   "units", 'F' );
    dataloader->AddVariable( "PipTh", "PipTh", "units", 'F' );
    dataloader->AddVariable( "PimTh", "PimTh", "units", 'F' );
+
+// Constant
+//   dataloader->AddVariable( "ElEdep",  "ElEdep",  "units", 'F' );
+   dataloader->AddVariable( "PEdep",   "PEdep",   "units", 'F' );
+   dataloader->AddVariable( "PipEdep", "PipEdep", "units", 'F' );
+   dataloader->AddVariable( "PimEdep", "PimEdep", "units", 'F' );
+
+// NaN / Inf
+   dataloader->AddVariable( "ElDeltaE",  "ElDeltaE",  "units", 'F' );
+   dataloader->AddVariable( "PDeltaE",   "PDeltaE",   "units", 'F' );
+   dataloader->AddVariable( "PipDeltaE", "PipDeltaE", "units", 'F' );
+   dataloader->AddVariable( "PimDeltaE", "PimDeltaE", "units", 'F' );
+
+// Constant
+//   dataloader->AddVariable( "ElPreE",  "ElPreE",  "units", 'F' );
+   dataloader->AddVariable( "PPreE",   "PPreE",   "units", 'F' );
+   dataloader->AddVariable( "PipPreE", "PipPreE", "units", 'F' );
+   dataloader->AddVariable( "PimPreE", "PimPreE", "units", 'F' );
+
+   dataloader->AddVariable( "ElPhi",  "ElPhi",  "units", 'F' );
+   dataloader->AddVariable( "PPhi",   "PPhi",   "units", 'F' );
+   dataloader->AddVariable( "PipPhi", "PipPhi", "units", 'F' );
+   dataloader->AddVariable( "PimPhi", "PimPhi", "units", 'F' );
 
 
    // global event weights per tree (see below for setting event-wise weights)
