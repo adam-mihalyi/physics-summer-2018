@@ -261,6 +261,7 @@ int TMVAClassification( TString myMethodList = "" )
    dataloader->AddVariable( "PipPhi", "PipPhi", "units", 'F' );
    dataloader->AddVariable( "PimPhi", "PimPhi", "units", 'F' );
 
+   dataloader->AddVariable( "Topo_all := (Topo == 0)",  "Topo_all",  "", 'F' );
 
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
