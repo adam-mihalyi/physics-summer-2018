@@ -224,9 +224,9 @@ int TMVAClassification( TString myMethodList = "" )
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
 
-   vector<TString> variableNames;
-   vector<TString> particleNames = {"El","P","Pip","Pim"};
-   vector<TString> particleProperties = {"Time","P","Th"};
+   std::vector<TString> variableNames;
+   std::vector<TString> particleNames = {"El","P","Pip","Pim"};
+   std::vector<TString> particleProperties = {"Time","P","Th","DeltaE"};
 
    // Add (particleName + particleProperty) string to variableNames in all possible combinations
    for(auto const& pn: particleNames)
