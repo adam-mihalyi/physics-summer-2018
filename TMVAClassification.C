@@ -223,53 +223,56 @@ int TMVAClassification( TString myMethodList = "" )
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
-   dataloader->AddVariable( "ElTime",  "ElTime",  "units", 'F' );
-   dataloader->AddVariable( "PTime",   "PTime",   "units", 'F' );
-   dataloader->AddVariable( "PipTime", "PipTime", "units", 'F' );
-   dataloader->AddVariable( "PimTime", "PimTime", "units", 'F' );
 
-   dataloader->AddVariable( "ElP",  "ElP",  "units", 'F' );
-   dataloader->AddVariable( "PP",   "PP",   "units", 'F' );
-   dataloader->AddVariable( "PipP", "PipP", "units", 'F' );
-   dataloader->AddVariable( "PimP", "PimP", "units", 'F' );
+   vector<TString> variableNames;
+   vector<TString> particleNames = {"El","P","Pip","Pim"};
+   vector<TString> particleProperties = {"Time","P","Th"};
 
-   dataloader->AddVariable( "ElTh",  "ElTh",  "units", 'F' );
-   dataloader->AddVariable( "PTh",   "PTh",   "units", 'F' );
-   dataloader->AddVariable( "PipTh", "PipTh", "units", 'F' );
-   dataloader->AddVariable( "PimTh", "PimTh", "units", 'F' );
+   // Add (particleName + particleProperty) string to variableNames in all possible combinations
+   for(auto const& pn: particleNames)
+     for(auto const& pp: particleProperties)
+       variableNames.push_back(pn+pp);
 
-// Constant
-//   dataloader->AddVariable( "ElEdep",  "ElEdep",  "units", 'F' );
-   dataloader->AddVariable( "PEdep",   "PEdep",   "units", 'F' );
-   dataloader->AddVariable( "PipEdep", "PipEdep", "units", 'F' );
-   dataloader->AddVariable( "PimEdep", "PimEdep", "units", 'F' );
+   //vector<TString> variableNames = {"ElTime","PTime","PipTime","PimTime","ElP","PP","PipP","PimP","ElTh","PTh","PipTh","PimTh"};
 
-// NaN / Inf
-   dataloader->AddVariable( "ElDeltaE",  "ElDeltaE",  "units", 'F' );
-   dataloader->AddVariable( "PDeltaE",   "PDeltaE",   "units", 'F' );
-   dataloader->AddVariable( "PipDeltaE", "PipDeltaE", "units", 'F' );
-   dataloader->AddVariable( "PimDeltaE", "PimDeltaE", "units", 'F' );
+   for(auto const& value: variableNames) {
+     dataloader->AddVariable( value, value, "units", 'F' );
+   };
 
-// Constant
-//   dataloader->AddVariable( "ElPreE",  "ElPreE",  "units", 'F' );
-   dataloader->AddVariable( "PPreE",   "PPreE",   "units", 'F' );
-   dataloader->AddVariable( "PipPreE", "PipPreE", "units", 'F' );
-   dataloader->AddVariable( "PimPreE", "PimPreE", "units", 'F' );
 
-   dataloader->AddVariable( "ElPhi",  "ElPhi",  "units", 'F' );
-   dataloader->AddVariable( "PPhi",   "PPhi",   "units", 'F' );
-   dataloader->AddVariable( "PipPhi", "PipPhi", "units", 'F' );
-   dataloader->AddVariable( "PimPhi", "PimPhi", "units", 'F' );
 
-   dataloader->AddVariable( "Topo_all := (Topo == 0)",  "Topo_all",  "", 'F' );
+//// Constant
+////   dataloader->AddVariable( "ElEdep",  "ElEdep",  "units", 'F' );
+//   dataloader->AddVariable( "PEdep",   "PEdep",   "units", 'F' );
+//   dataloader->AddVariable( "PipEdep", "PipEdep", "units", 'F' );
+//   dataloader->AddVariable( "PimEdep", "PimEdep", "units", 'F' );
+//
+//// NaN / Inf
+//   dataloader->AddVariable( "ElDeltaE",  "ElDeltaE",  "units", 'F' );
+//   dataloader->AddVariable( "PDeltaE",   "PDeltaE",   "units", 'F' );
+//   dataloader->AddVariable( "PipDeltaE", "PipDeltaE", "units", 'F' );
+//   dataloader->AddVariable( "PimDeltaE", "PimDeltaE", "units", 'F' );
+//
+//// Constant
+////   dataloader->AddVariable( "ElPreE",  "ElPreE",  "units", 'F' );
+//   dataloader->AddVariable( "PPreE",   "PPreE",   "units", 'F' );
+//   dataloader->AddVariable( "PipPreE", "PipPreE", "units", 'F' );
+//   dataloader->AddVariable( "PimPreE", "PimPreE", "units", 'F' );
+//
+//   dataloader->AddVariable( "ElPhi",  "ElPhi",  "units", 'F' );
+//   dataloader->AddVariable( "PPhi",   "PPhi",   "units", 'F' );
+//   dataloader->AddVariable( "PipPhi", "PipPhi", "units", 'F' );
+//   dataloader->AddVariable( "PimPhi", "PimPhi", "units", 'F' );
+//
+//   dataloader->AddVariable( "Topo_all := (Topo == 0)",  "Topo_all",  "", 'F' );
 
    // global event weights per tree (see below for setting event-wise weights)
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
 
-   // You can add an arbitrary number of signal or background trees
-   dataloader->AddSignalTree    ( signalTree,     signalWeight );
-   dataloader->AddBackgroundTree( background, backgroundWeight );
+//   // You can add an arbitrary number of signal or background trees
+//   dataloader->AddSignalTree    ( signalTree,     signalWeight );
+//   dataloader->AddBackgroundTree( background, backgroundWeight );
 
    // To give different trees for training and testing, do as follows:
    //
@@ -281,33 +284,33 @@ int TMVAClassification( TString myMethodList = "" )
    // NOTE that in this case one should not give expressions (such as "var1+var2") in the input
    //      variable definition, but simply compute the expression before adding the event
    // ```cpp
-   // // --- begin ----------------------------------------------------------
-   // std::vector<Double_t> vars( 4 ); // vector has size of number of input variables
-   // Float_t  treevars[4], weight;
-   //
-   // // Signal
-   // for (UInt_t ivar=0; ivar<4; ivar++) signalTree->SetBranchAddress( Form( "var%i", ivar+1 ), &(treevars[ivar]) );
-   // for (UInt_t i=0; i<signalTree->GetEntries(); i++) {
-   //    signalTree->GetEntry(i);
-   //    for (UInt_t ivar=0; ivar<4; ivar++) vars[ivar] = treevars[ivar];
-   //    // add training and test events; here: first half is training, second is testing
-   //    // note that the weight can also be event-wise
-   //    if (i < signalTree->GetEntries()/2.0) dataloader->AddSignalTrainingEvent( vars, signalWeight );
-   //    else                              dataloader->AddSignalTestEvent    ( vars, signalWeight );
-   // }
-   //
-   // // Background (has event weights)
-   // background->SetBranchAddress( "weight", &weight );
-   // for (UInt_t ivar=0; ivar<4; ivar++) background->SetBranchAddress( Form( "var%i", ivar+1 ), &(treevars[ivar]) );
-   // for (UInt_t i=0; i<background->GetEntries(); i++) {
-   //    background->GetEntry(i);
-   //    for (UInt_t ivar=0; ivar<4; ivar++) vars[ivar] = treevars[ivar];
-   //    // add training and test events; here: first half is training, second is testing
-   //    // note that the weight can also be event-wise
-   //    if (i < background->GetEntries()/2) dataloader->AddBackgroundTrainingEvent( vars, backgroundWeight*weight );
-   //    else                                dataloader->AddBackgroundTestEvent    ( vars, backgroundWeight*weight );
-   // }
-   // // --- end ------------------------------------------------------------
+   // --- begin ----------------------------------------------------------
+   int nVars = variableNames.size();
+   std::vector<Double_t> vars( nVars ); // vector has size of number of input variables
+   Float_t  treevars[nVars];
+
+   // Signal
+   for (UInt_t ivar=0; ivar<nVars; ivar++) signalTree->SetBranchAddress( variableNames[ivar], &(treevars[ivar]) );
+   for (UInt_t i=0; i<signalTree->GetEntries(); i++) {
+      signalTree->GetEntry(i);
+      for (UInt_t ivar=0; ivar<nVars; ivar++) vars[ivar] = treevars[ivar];
+      // add training and test events; here: first half is training, second is testing
+      // note that the weight can also be event-wise
+      if (i < signalTree->GetEntries()/2.0) dataloader->AddSignalTrainingEvent( vars, signalWeight );
+      else                              dataloader->AddSignalTestEvent    ( vars, signalWeight );
+   }
+
+   // Background
+   for (UInt_t ivar=0; ivar<nVars; ivar++) background->SetBranchAddress( variableNames[ivar], &(treevars[ivar]) );
+   for (UInt_t i=0; i<background->GetEntries(); i++) {
+      background->GetEntry(i);
+      for (UInt_t ivar=0; ivar<nVars; ivar++) vars[ivar] = treevars[ivar];
+      // add training and test events; here: first half is training, second is testing
+      // note that the weight can also be event-wise
+      if (i < background->GetEntries()/2) dataloader->AddBackgroundTrainingEvent( vars, backgroundWeight );
+      else                                dataloader->AddBackgroundTestEvent    ( vars, backgroundWeight );
+   }
+   // --- end ------------------------------------------------------------
    // ```
    // End of tree registration
 
