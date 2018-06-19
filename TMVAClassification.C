@@ -189,12 +189,15 @@ int TMVAClassification( TString myMethodList = "" )
 
    // Register the training and test trees
 
-   TTree *signalTree0     = (TTree*)input->Get("HSParticles");
-   TTree *background0     = (TTree*)input2->Get("HSParticles");
-   gROOT->cd();
-   TTree *signalTree    =signalTree0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
-   gROOT->cd();
-   TTree *background     = background0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
+   TTree *signalTree     = (TTree*)input->Get("HSParticles");
+   TTree *background     = (TTree*)input2->Get("HSParticles");
+
+//   TTree *signalTree0     = (TTree*)input->Get("HSParticles");
+//   TTree *background0     = (TTree*)input2->Get("HSParticles");
+//   gROOT->cd();
+//   TTree *signalTree    =signalTree0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
+//   gROOT->cd();
+//   TTree *background     = background0->CopyTree("Detector==0&&PipTime!=0&&PimTime!=0&&PTime!=0&&!TMath::IsNaN(PipDeltaE)&&!TMath::IsNaN(PimDeltaE)&&!TMath::IsNaN(ElDeltaE)&&!TMath::IsNaN(PDeltaE)");
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
    TString outfileName( "TMVA.root" );
@@ -293,7 +296,12 @@ int TMVAClassification( TString myMethodList = "" )
    for (UInt_t ivar=0; ivar<nVars; ivar++) signalTree->SetBranchAddress( variableNames[ivar], &(treevars[ivar]) );
    for (UInt_t i=0; i<signalTree->GetEntries(); i++) {
       signalTree->GetEntry(i);
-      for (UInt_t ivar=0; ivar<nVars; ivar++) vars[ivar] = treevars[ivar];
+      for (UInt_t ivar=0; ivar<nVars; ivar++) {
+         if (std::isnan(treevars[ivar]))
+           vars[ivar] = 0;
+         else
+           vars[ivar] = treevars[ivar];
+      }
       // add training and test events; here: first half is training, second is testing
       // note that the weight can also be event-wise
       if (i < signalTree->GetEntries()/2.0) dataloader->AddSignalTrainingEvent( vars, signalWeight );
@@ -304,7 +312,12 @@ int TMVAClassification( TString myMethodList = "" )
    for (UInt_t ivar=0; ivar<nVars; ivar++) background->SetBranchAddress( variableNames[ivar], &(treevars[ivar]) );
    for (UInt_t i=0; i<background->GetEntries(); i++) {
       background->GetEntry(i);
-      for (UInt_t ivar=0; ivar<nVars; ivar++) vars[ivar] = treevars[ivar];
+      for (UInt_t ivar=0; ivar<nVars; ivar++ ) {
+         if (std::isnan(treevars[ivar]))
+           vars[ivar] = 0;
+         else
+           vars[ivar] = treevars[ivar];
+      }
       // add training and test events; here: first half is training, second is testing
       // note that the weight can also be event-wise
       if (i < background->GetEntries()/2) dataloader->AddBackgroundTrainingEvent( vars, backgroundWeight );
