@@ -164,7 +164,7 @@ int TMVAClassification( TString myMethodList = "" )
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *input(0);
-   TString fname = "/scratch/dglazier/tmva3/Signal2Pi.root";
+   TString fname = "/home/adam/preprocess/ppSignal2Pi.root"; //"/scratch/dglazier/tmva3/Signal2Pi.root";
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    }
@@ -176,7 +176,7 @@ int TMVAClassification( TString myMethodList = "" )
 
 
    TFile *input2(0);
-   TString fname2 = "/scratch/dglazier/tmva3/BG2Pi.root";
+   TString fname2 = "/home/adam/preprocess/ppBG2Pi.root"; //"/scratch/dglazier/tmva3/BG2Pi.root";
    if (!gSystem->AccessPathName( fname2 )) {
       input2 = TFile::Open( fname2 ); // check if file in local directory exists
    }
