@@ -78,7 +78,7 @@ int TMVAClassification( TString myMethodList = "" )
 
    // Cut optimisation
    Use["Cuts"]            = 1;
-   Use["CutsD"]           = 1;
+   Use["CutsD"]           = 0;
    Use["CutsPCA"]         = 0;
    Use["CutsGA"]          = 0;
    Use["CutsSA"]          = 0;
