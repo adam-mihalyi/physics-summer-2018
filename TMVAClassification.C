@@ -214,7 +214,10 @@ int TMVAClassification( TString myMethodList = "" )
    // All TMVA output can be suppressed by removing the "!" (not) in
    // front of the "Silent" argument in the option string
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
-                                               "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+                                               "!V:!Silent:Color:DrawProgressBar:Transformations=I:AnalysisType=Classification" );
+
+//   TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
+//                                               "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
 
    TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset");
    // If you wish to modify default settings
@@ -237,6 +240,11 @@ int TMVAClassification( TString myMethodList = "" )
        variableNames.push_back(pn+pp);
 
    //vector<TString> variableNames = {"ElTime","PTime","PipTime","PimTime","ElP","PP","PipP","PimP","ElTh","PTh","PipTh","PimTh"};
+
+   variableNames.push_back("IsTopo0");
+   variableNames.push_back("IsTopo1");
+   variableNames.push_back("IsTopo2");
+   variableNames.push_back("IsTopo3");
 
    for(auto const& value: variableNames) {
      dataloader->AddVariable( value, value, "units", 'F' );
